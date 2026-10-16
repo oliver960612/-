@@ -1,0 +1,1441 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5f0">
+  <meta name="description" content="赴約不慌，幫你安排約會的準備時間、出門時間與攜帶清單。">
+  <title>赴約不慌｜出門不趕行事曆</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #28332f;
+      --muted: #78827b;
+      --muted-2: #9ca49e;
+      --paper: #f7f5f0;
+      --surface: #fffefa;
+      --line: #e9e8e1;
+      --green: #2f6657;
+      --green-dark: #244f43;
+      --green-pale: #e8f1eb;
+      --coral: #d9755e;
+      --coral-pale: #fff0e9;
+      --yellow: #f4d68e;
+      --shadow: 0 14px 42px rgba(45, 57, 50, .07);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 84% 0%, rgba(244, 214, 142, .2), transparent 22rem),
+        var(--paper);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(47, 102, 87, .25);
+      outline-offset: 2px;
+    }
+    .app-shell { width: min(1240px, calc(100% - 48px)); margin: 0 auto; padding: 27px 0 44px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 27px; }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 44px; height: 44px; display: grid; place-items: center; flex: 0 0 auto;
+      border-radius: 15px; color: #fffefa; background: var(--green); box-shadow: 0 7px 16px rgba(47,102,87,.18);
+    }
+    .brand-mark svg { width: 24px; height: 24px; }
+    .brand-name { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: .03em; line-height: 1.2; }
+    .brand-tagline { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 9px; }
+    .local-badge { display: inline-flex; align-items: center; gap: 7px; color: #66766d; font-size: 12px; white-space: nowrap; }
+    .local-badge .dot { width: 7px; height: 7px; border-radius: 99px; background: #70a98e; box-shadow: 0 0 0 3px #e3eee7; }
+    .local-badge.is-error { color: #a14f3c; }
+    .local-badge.is-error .dot { background: #d9755e; box-shadow: 0 0 0 3px #fff0e9; }
+    button:disabled { opacity: .5; cursor: not-allowed; transform: none !important; }
+    .storage-warning { margin: 0 0 18px; padding: 11px 14px; border: 1px solid #efcebc; border-radius: 12px; color: #934e39; background: #fff0e9; font-size: 13px; }
+    .icon-button, .subtle-button, .primary-button, .outline-button {
+      border: 0; cursor: pointer; transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+    .icon-button:hover, .subtle-button:hover, .primary-button:hover, .outline-button:hover { transform: translateY(-1px); }
+    .icon-button { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px; color: var(--muted); background: transparent; }
+    .icon-button:hover { color: var(--ink); background: #eeeee8; }
+    .icon-button svg { width: 18px; height: 18px; }
+    .primary-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      padding: 12px 17px; border-radius: 14px; color: #fffefa; background: var(--green); font-weight: 700;
+      box-shadow: 0 7px 16px rgba(47,102,87,.16);
+    }
+    .primary-button:hover { background: var(--green-dark); box-shadow: 0 9px 20px rgba(47,102,87,.22); }
+    .primary-button svg { width: 17px; height: 17px; }
+    .outline-button { padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); background: #fffefa; font-size: 13px; }
+    .outline-button:hover { border-color: #cbd7ce; color: var(--green); }
+    .subtle-button { padding: 7px 9px; border-radius: 10px; color: var(--muted); background: transparent; font-size: 12px; }
+    .subtle-button:hover { color: var(--green); background: var(--green-pale); }
+
+    .layout { display: grid; grid-template-columns: 325px minmax(0, 1fr); align-items: start; gap: 23px; }
+    .sidebar, .main-column { display: grid; gap: 19px; min-width: 0; }
+    .panel { border: 1px solid rgba(231, 231, 223, .9); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+    .calendar-panel { padding: 21px 20px 19px; }
+    .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .panel-title { margin: 0; font-size: 15px; font-weight: 800; }
+    .month-label { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: .02em; }
+    .calendar-nav { display: flex; align-items: center; gap: 2px; }
+    .calendar-nav .icon-button { width: 29px; height: 29px; }
+    .weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
+    .weekdays { margin-top: 20px; color: var(--muted-2); font-size: 11px; font-weight: 700; }
+    .calendar-grid { row-gap: 5px; margin-top: 9px; }
+    .calendar-day, .calendar-empty { position: relative; width: 35px; height: 37px; justify-self: center; }
+    .calendar-tools { margin-top: 8px; text-align: center; }
+    .calendar-day {
+      display: grid; place-items: center; border: 0; border-radius: 12px; color: #58635c; background: transparent;
+      cursor: pointer; font-size: 12px; font-weight: 600; transition: background .15s ease, color .15s ease;
+    }
+    .calendar-day:hover { background: #f0f3ed; }
+    .calendar-day.selected { color: #fffefa; background: var(--green); box-shadow: 0 5px 11px rgba(47,102,87,.2); }
+    .calendar-day.today:not(.selected) { color: var(--coral); background: var(--coral-pale); font-weight: 800; }
+    .calendar-day.has-event::after { content: ""; position: absolute; bottom: 3px; left: 50%; width: 4px; height: 4px; border-radius: 50%; background: var(--coral); transform: translateX(-50%); }
+    .calendar-day.selected.has-event::after { background: var(--yellow); }
+    .calendar-legend { display: flex; align-items: center; gap: 15px; margin-top: 17px; padding-top: 15px; border-top: 1px solid #f0f0eb; color: var(--muted); font-size: 11px; }
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--coral); }
+    .legend-today { width: 9px; height: 9px; border-radius: 4px; background: var(--coral-pale); border: 1px solid #f8d6c8; }
+    .today-button { color: var(--green); font-weight: 700; }
+
+    .side-note { position: relative; overflow: hidden; padding: 20px 21px; border: 1px solid #eadfc8; border-radius: var(--radius); background: #fbf3df; }
+    .side-note::after { content: "✳"; position: absolute; right: 13px; bottom: -23px; color: rgba(196, 151, 66, .13); font-size: 100px; line-height: 1; transform: rotate(-15deg); pointer-events: none; }
+    .note-eyebrow { margin: 0 0 7px; color: #a77932; font-size: 11px; font-weight: 800; letter-spacing: .1em; }
+    .note-title { max-width: 230px; margin: 0; font-size: 16px; font-weight: 800; line-height: 1.5; }
+    .note-copy { max-width: 238px; margin: 8px 0 0; color: #82775f; font-size: 12px; }
+
+    .welcome-card { position: relative; overflow: hidden; padding: 27px 29px; border-radius: 25px; color: #fffefa; background: linear-gradient(112deg, #2e6556 0%, #467c69 62%, #639077 100%); box-shadow: 0 15px 30px rgba(47,102,87,.18); }
+    .welcome-card::before, .welcome-card::after { content: ""; position: absolute; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; pointer-events: none; }
+    .welcome-card::before { width: 220px; height: 220px; right: -28px; top: -130px; }
+    .welcome-card::after { width: 150px; height: 150px; right: 30px; top: -96px; }
+    .welcome-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .welcome-kicker { margin: 0 0 7px; color: #d0e4d6; font-size: 12px; font-weight: 700; letter-spacing: .07em; }
+    .welcome-title { margin: 0; font-size: clamp(20px, 2.4vw, 27px); font-weight: 800; letter-spacing: .015em; }
+    .welcome-copy { margin: 7px 0 0; color: rgba(255,255,255,.75); font-size: 13px; }
+    .welcome-date { min-width: 112px; padding-left: 22px; border-left: 1px solid rgba(255,255,255,.25); text-align: right; }
+    .welcome-date strong { display: block; font-size: 24px; line-height: 1.2; }
+    .welcome-date span { display: block; margin-top: 5px; color: rgba(255,255,255,.72); font-size: 12px; }
+
+    .reminder-card { display: flex; align-items: center; gap: 13px; padding: 15px 18px; border: 1px solid #f1ded1; border-radius: 17px; background: #fff7f1; }
+    .reminder-icon { width: 37px; height: 37px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 13px; color: #bc654d; background: #ffe9dd; }
+    .reminder-icon svg { width: 18px; height: 18px; }
+    .reminder-text { min-width: 0; flex: 1; }
+    .reminder-label { display: block; margin-bottom: 2px; color: #a16b59; font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+    .reminder-message { margin: 0; color: #66483e; font-size: 13px; font-weight: 700; }
+    .reminder-sub { margin: 2px 0 0; color: #a18175; font-size: 11px; }
+    .reminder-card.is-now { border-color: #edc6b5; background: #fff0e9; }
+    .reminder-card.is-done { border-color: #dce9df; background: #f2f7f1; }
+    .reminder-card.is-done .reminder-icon { color: var(--green); background: #e2efe5; }
+    .day-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin: 2px 2px 0; }
+    .day-title-wrap { min-width: 0; }
+    .day-eyebrow { margin: 0 0 3px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; }
+    .day-title { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: .01em; }
+    .day-count { margin: 0 0 3px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .day-agenda { margin: 11px 0 13px; }
+    .day-agenda-heading { margin: 0 0 6px; color: #7f8a81; font-size: 10px; font-weight: 800; letter-spacing: .04em; }
+    .day-agenda-rows { display: grid; gap: 6px; }
+    .agenda-row { width: 100%; display: grid; grid-template-columns: 52px minmax(0, 1fr) 16px; align-items: center; gap: 9px; padding: 9px 11px; border: 1px solid #e8ede6; border-radius: 12px; color: var(--ink); background: rgba(255,255,255,.78); cursor: pointer; text-align: left; transition: border-color .15s ease, background .15s ease; }
+    .agenda-row:hover, .agenda-row:focus-visible { border-color: #b9cdbd; background: #fff; }
+    .agenda-time { color: #a05e49; font-size: 13px; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .agenda-description { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+    .agenda-name { overflow: hidden; color: #45564c; font-size: 12px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .agenda-location { overflow: hidden; color: #929b93; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+    .agenda-arrow { color: #aab4aa; font-size: 14px; }
+    .agenda-row-fallback { margin: 0; padding: 9px 11px; border: 1px solid #e8ede6; border-radius: 12px; color: #45564c; background: #fff; font-size: 12px; font-weight: 800; }
+    .events-wrap { display: grid; gap: 13px; }
+    .event-card { position: relative; display: grid; grid-template-columns: 89px minmax(0, 1fr); gap: 15px; padding: 17px; border: 1px solid var(--line); border-radius: 19px; background: var(--surface); box-shadow: 0 6px 18px rgba(45,57,50,.035); transition: box-shadow .18s ease, transform .18s ease; }
+    .event-card:hover { box-shadow: 0 10px 25px rgba(45,57,50,.08); transform: translateY(-1px); }
+    .event-time-column { display: flex; flex-direction: column; align-items: center; padding: 5px 8px 0 0; border-right: 1px solid #efefe9; text-align: center; }
+    .event-start-time { color: var(--ink); font-size: 20px; font-weight: 800; line-height: 1.2; font-variant-numeric: tabular-nums; }
+    .event-time-caption { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .event-category-icon { width: 34px; height: 34px; display: grid; place-items: center; margin-top: 12px; border-radius: 12px; color: var(--green); background: var(--green-pale); font-size: 16px; }
+    .event-main { min-width: 0; }
+    .event-topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .event-title { overflow-wrap: anywhere; margin: 0; font-size: 16px; font-weight: 800; line-height: 1.35; }
+    .event-type { display: inline-flex; align-items: center; margin-top: 5px; padding: 3px 8px; border-radius: 20px; color: #688073; background: #f0f5ef; font-size: 10px; font-weight: 700; }
+    .event-date { margin: 7px 0 0; color: #89948c; font-size: 10px; }
+    .event-actions { display: flex; flex: 0 0 auto; gap: 2px; margin: -5px -6px 0 0; }
+    .event-actions .icon-button { width: 30px; height: 30px; }
+    .event-location { display: flex; align-items: center; gap: 6px; overflow-wrap: anywhere; margin: 10px 0 14px; color: #68746d; font-size: 12px; }
+    .event-location svg { width: 14px; height: 14px; flex: 0 0 auto; color: var(--coral); }
+    .event-origin { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px; margin: -7px 0 12px; color: #929b93; font-size: 10px; }
+    .event-origin strong { color: #68746d; font-size: 11px; font-weight: 700; }
+    .trip-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; margin: 11px 0 13px; padding: 11px 12px; border: 1px solid #edf0e9; border-radius: 13px; background: #fbfcf9; }
+    .trip-detail { min-width: 0; }
+    .trip-detail-label { display: block; margin-bottom: 2px; color: #929b93; font-size: 9px; font-weight: 700; }
+    .trip-detail-value { display: block; overflow-wrap: anywhere; color: #59665e; font-size: 11px; font-weight: 700; }
+    .map-directions-link { grid-column: 1 / -1; display: inline-flex; align-items: center; gap: 4px; color: #557867; font-size: 11px; font-weight: 800; text-decoration: none; }
+    .map-directions-link:hover { color: #324e40; text-decoration: underline; }
+    .origin-current-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .origin-status { color: #78827b; font-size: 11px; }
+    .origin-help { margin: 7px 0 0; color: #929b93; font-size: 10px; }
+    .map-search-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 7px; }
+    .map-search-help { margin: 0; color: #929b93; font-size: 10px; line-height: 1.5; }
+    [hidden] { display: none !important; }
+    .timeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin: 0 0 14px; }
+    .timeline-step { min-width: 0; padding: 9px 10px; border-radius: 12px; background: #f7f8f4; }
+    .timeline-step.highlight { background: #fdf1e9; }
+    .timeline-step.meet { background: #edf4ee; }
+    .step-label { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; color: var(--muted); font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .step-label .step-dot { width: 5px; height: 5px; flex: 0 0 auto; border-radius: 50%; background: #b8c4bb; }
+    .highlight .step-dot { background: var(--coral); }
+    .meet .step-dot { background: var(--green); }
+    .step-time { display: block; overflow: hidden; color: var(--ink); font-size: 13px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .step-detail { display: block; margin-top: 3px; color: #78827b; font-size: 10px; overflow-wrap: anywhere; }
+    .time-day { display: block; color: #a15f49; font-size: 10px; white-space: normal; }
+    .checklist { padding-top: 11px; border-top: 1px solid #efefe9; }
+    .checklist-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+    .checklist-title { margin: 0; color: #657168; font-size: 11px; font-weight: 800; }
+    .checklist-progress { color: #97a097; font-size: 10px; }
+    .checklist-items { display: flex; flex-wrap: wrap; gap: 7px; }
+    .check-item { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 6px 9px; border: 1px solid #eceee8; border-radius: 10px; color: #657168; background: #fff; cursor: pointer; font-size: 11px; text-align: left; transition: border-color .15s ease, background .15s ease; }
+    .check-item:hover { border-color: #c9d8cc; background: #f8fbf7; }
+    .check-item input { width: 13px; height: 13px; margin: 0; accent-color: var(--green); cursor: pointer; }
+    .check-item.is-checked { color: #9ca69d; background: #f7f8f5; text-decoration: line-through; }
+    .no-items { color: #9aa39c; font-size: 11px; }
+    .empty-state { display: grid; place-items: center; min-height: 260px; padding: 35px 20px; border: 1px dashed #d8ddd5; border-radius: 20px; background: rgba(255,254,250,.7); text-align: center; }
+    .empty-illustration { width: 54px; height: 54px; display: grid; place-items: center; margin-bottom: 13px; border-radius: 19px; color: var(--green); background: var(--green-pale); font-size: 24px; }
+    .empty-title { margin: 0; font-size: 16px; font-weight: 800; }
+    .empty-copy { max-width: 270px; margin: 6px 0 15px; color: var(--muted); font-size: 12px; }
+    .footer-note { display: flex; align-items: center; justify-content: center; gap: 7px; padding-top: 3px; color: #9ba39b; font-size: 11px; }
+    .footer-note svg { width: 13px; height: 13px; }
+
+    .modal-backdrop { position: fixed; z-index: 10; inset: 0; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(28, 39, 33, .4); backdrop-filter: blur(4px); }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: min(590px, 100%); max-height: min(92vh, 850px); overflow: auto; padding: 24px; border: 1px solid rgba(255,255,255,.7); border-radius: 23px; background: var(--surface); box-shadow: 0 24px 70px rgba(19, 33, 25, .2); animation: modal-in .18s ease-out; }
+    @keyframes modal-in { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 19px; }
+    .modal-eyebrow { margin: 0 0 3px; color: var(--coral); font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+    .modal-title { margin: 0; font-size: 21px; font-weight: 800; }
+    .modal-copy { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .time-preview { grid-column: 1 / -1; padding: 11px 13px; border-radius: 12px; color: #496657; background: #edf4ee; font-size: 12px; line-height: 1.7; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+    .field { min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+    .field label, .field-label { display: block; margin-bottom: 6px; color: #59665e; font-size: 12px; font-weight: 800; }
+    .field label .required { color: var(--coral); }
+    .field input, .field select, .field textarea { width: 100%; min-height: 43px; padding: 10px 12px; border: 1px solid #e3e7df; border-radius: 12px; color: var(--ink); background: #fff; font-size: 13px; }
+    .field textarea { min-height: 88px; resize: vertical; line-height: 1.6; }
+    .field input::placeholder, .field textarea::placeholder { color: #b1b8b1; }
+    .field-help { margin: 5px 0 0; color: #929b93; font-size: 10px; }
+    .input-suffix { position: relative; }
+    .input-suffix input { padding-right: 49px; }
+    .input-suffix span { position: absolute; top: 50%; right: 12px; color: #929b93; font-size: 11px; transform: translateY(-50%); pointer-events: none; }
+    .template-row { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-bottom: 6px; }
+    .template-row .field-label { margin: 0; }
+    .form-divider { grid-column: 1 / -1; height: 1px; margin: 1px 0; background: #eeefe9; }
+    .form-error { display: none; grid-column: 1 / -1; padding: 9px 11px; border-radius: 10px; color: #a14f3c; background: #fff0e9; font-size: 12px; }
+    .form-error.show { display: block; }
+    .modal-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 19px; }
+    .modal-actions-right { display: flex; gap: 8px; }
+    .delete-button { border: 0; padding: 9px 10px; border-radius: 11px; color: #b15c4a; background: transparent; cursor: pointer; font-size: 12px; }
+    .delete-button:hover { background: #fff0e9; }
+    .toast { position: fixed; z-index: 20; right: 24px; bottom: 23px; display: flex; align-items: center; gap: 9px; max-width: min(380px, calc(100% - 32px)); padding: 12px 15px; border: 1px solid rgba(255,255,255,.8); border-radius: 14px; color: #fff; background: #293f34; box-shadow: 0 10px 30px rgba(25,40,31,.2); font-size: 12px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: opacity .2s ease, transform .2s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast-icon { width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; color: #264f40; background: #cce5d5; font-size: 12px; font-weight: 900; }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 285px minmax(0, 1fr); gap: 16px; }
+      .app-shell { width: min(100% - 34px, 850px); }
+      .calendar-panel { padding: 18px 15px; }
+      .calendar-day, .calendar-empty { width: 32px; }
+      .event-card { grid-template-columns: 72px minmax(0, 1fr); gap: 12px; padding: 15px; }
+    }
+    @media (max-width: 720px) {
+      .app-shell { width: min(100% - 28px, 560px); padding-top: 16px; }
+      .topbar { align-items: flex-start; margin-bottom: 18px; }
+      .brand-mark { width: 40px; height: 40px; border-radius: 14px; }
+      .brand-name { font-size: 16px; }
+      .brand-tagline { font-size: 11px; }
+      .local-badge { display: none; }
+      .topbar-right { gap: 3px; }
+      .layout { grid-template-columns: 1fr; gap: 16px; }
+      .main-column { grid-row: 2; }
+      .sidebar { grid-row: 1; grid-template-columns: minmax(0, 1fr); }
+      .welcome-card { padding: 22px 20px; }
+      .welcome-date { min-width: 88px; padding-left: 15px; }
+      .welcome-date strong { font-size: 21px; }
+      .day-title { font-size: 20px; }
+      .day-heading { align-items: center; }
+      .side-note { display: none; }
+      .calendar-panel { padding: 18px 20px; }
+      .calendar-day, .calendar-empty { width: 38px; height: 38px; }
+    }
+    @media (max-width: 480px) {
+      .app-shell { width: calc(100% - 22px); padding-bottom: 27px; }
+      .topbar { align-items: center; gap: 8px; }
+      .brand { gap: 8px; }
+      .topbar-right { flex-shrink: 0; }
+      .topbar .primary-button { min-height: 44px; padding: 10px 12px; font-size: 13px; }
+      .brand-tagline { display: none; }
+      .welcome-card { padding: 19px 17px; border-radius: 20px; }
+      .welcome-content { gap: 12px; }
+      .welcome-title { font-size: 19px; }
+      .welcome-copy { max-width: 230px; font-size: 11px; }
+      .welcome-date { min-width: 70px; padding-left: 11px; }
+      .welcome-date strong { font-size: 19px; }
+      .welcome-date span { font-size: 10px; }
+      .reminder-card { align-items: flex-start; padding: 13px; }
+      .reminder-message { font-size: 12px; }
+      .day-title { font-size: 18px; }
+      .day-count { font-size: 11px; }
+      .day-agenda { margin-top: 9px; }
+      .agenda-row { padding: 8px 9px; }
+      .event-card { grid-template-columns: 54px minmax(0, 1fr); gap: 10px; padding: 12px; border-radius: 16px; }
+      .event-time-column { padding-right: 7px; }
+      .event-start-time { font-size: 17px; }
+      .event-category-icon { width: 30px; height: 30px; margin-top: 11px; font-size: 14px; }
+      .event-title { padding-right: 2px; font-size: 14px; }
+      .event-actions { gap: 0; margin-right: -8px; }
+      .event-actions .icon-button { width: 27px; height: 27px; }
+      .event-location { margin: 8px 0 10px; font-size: 11px; }
+      .timeline { gap: 5px; margin-bottom: 10px; }
+      .timeline-step { padding: 7px 6px; border-radius: 10px; }
+      .step-label { gap: 4px; font-size: 9px; }
+      .step-time { font-size: 11px; }
+      .step-detail { font-size: 8px; }
+      .check-item { gap: 5px; padding: 5px 7px; font-size: 10px; }
+      .checklist { padding-top: 9px; }
+      .calendar-panel { padding: 17px 15px; }
+      .calendar-day, .calendar-empty { width: 100%; height: 44px; }
+      .calendar-nav .icon-button { width: 40px; height: 40px; }
+      .event-card { grid-template-columns: minmax(0, 1fr); }
+      .event-time-column { flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; padding: 0 0 9px; border-right: 0; border-bottom: 1px solid #efefe9; text-align: left; }
+      .event-time-caption { margin: 0; }
+      .event-category-icon { margin: 0 0 0 auto; }
+      .event-actions .icon-button { width: 40px; height: 40px; }
+      .timeline { grid-template-columns: minmax(0, 1fr); }
+      .timeline-step { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; padding: 10px 12px; }
+      .step-label { margin: 0; font-size: 11px; white-space: normal; }
+      .step-time { overflow: visible; font-size: 14px; text-align: right; }
+      .step-detail { grid-column: 1 / -1; font-size: 11px; }
+      .check-item { min-height: 40px; font-size: 12px; }
+      .footer-note { align-items: flex-start; text-align: center; }
+      .footer-note svg { flex: 0 0 auto; margin-top: 2px; }
+      .modal-backdrop { align-items: flex-end; padding: 0; }
+      .modal { width: 100%; max-height: 94vh; max-height: 94dvh; padding: 21px 17px max(23px, env(safe-area-inset-bottom)); border-radius: 22px 22px 0 0; }
+      .form-grid { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+      .field input, .field select, .field textarea { min-height: 44px; font-size: 16px; }
+      .modal-actions { flex-wrap: wrap; }
+      .modal-actions-right { margin-left: auto; flex-wrap: wrap; }
+      .toast { right: 11px; bottom: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 3v3M17 3v3M4.5 9h15M5.5 5h13A1.5 1.5 0 0 1 20 6.5v12A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5v-12A1.5 1.5 0 0 1 5.5 5Z"/>
+            <path d="m9 14 2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <p class="brand-name">赴約不慌</p>
+          <p class="brand-tagline">出門不趕行事曆</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="local-badge" id="storageBadge"><i class="dot" aria-hidden="true"></i><span id="storageBadgeText">資料保存在這個瀏覽器</span></span>
+        <button class="icon-button" id="clearDataButton" type="button" aria-label="清除本機行程資料" title="清除本機資料">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5.5 7l1 13h11l1-13M9 7V4h6v3"/></svg>
+        </button>
+        <button class="primary-button" id="addEventButton" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span>新增約會</span>
+        </button>
+      </div>
+    </header>
+    <p class="storage-warning" id="storageWarning" role="status" hidden></p>
+    <noscript><p class="storage-warning">請啟用 JavaScript，才能使用月曆、行程和物品勾選功能。</p></noscript>
+
+    <div class="layout">
+      <aside class="sidebar" aria-label="月曆與小提醒">
+        <section class="panel calendar-panel" aria-labelledby="calendarHeading">
+          <div class="panel-heading">
+            <h2 class="month-label" id="calendarHeading">2026 年 10 月</h2>
+            <div class="calendar-nav">
+              <button class="icon-button" id="prevMonth" type="button" aria-label="上一個月">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              <button class="icon-button" id="nextMonth" type="button" aria-label="下一個月">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="weekdays" aria-hidden="true">
+            <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid" role="group" aria-label="月曆日期，可用方向鍵選擇日期"></div>
+          <div class="calendar-legend">
+            <span class="legend-item"><i class="legend-dot" aria-hidden="true"></i>有行程</span>
+            <span class="legend-item"><i class="legend-today" aria-hidden="true"></i>今天</span>
+            <button class="subtle-button today-button" id="todayButton" type="button">回到今天</button>
+          </div>
+          <div class="calendar-tools"><button class="subtle-button" id="addDemoButton" type="button">加入示範行程</button></div>
+        </section>
+
+        <section class="side-note" aria-label="使用小提醒">
+          <p class="note-eyebrow">A LITTLE REMINDER</p>
+          <h2 class="note-title">留一點緩衝，<br>讓赴約的路也從容。</h2>
+          <p class="note-copy">交通時間可參考地圖後手動填入，準備時間和清單都能依照你的習慣調整。</p>
+        </section>
+      </aside>
+
+      <main class="main-column">
+        <section class="welcome-card" aria-label="歡迎與日期">
+          <div class="welcome-content">
+            <div>
+              <p class="welcome-kicker" id="welcomeKicker">今天，慢慢準備也來得及</p>
+              <h1 class="welcome-title">把期待留給見面，<br>出門的事交給我。</h1>
+              <p class="welcome-copy">時間排好、物品確認好，赴約就可以更從容。</p>
+            </div>
+            <div class="welcome-date" aria-label="所選日期">
+              <strong id="heroDateDay">16</strong>
+              <span id="heroDateWeekday">星期五</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="reminder-card" id="reminderCard" aria-live="polite" aria-atomic="true">
+          <div class="reminder-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2M5.5 4.5l-1.8 1.8M18.5 4.5l1.8 1.8"/></svg>
+          </div>
+          <div class="reminder-text">
+            <span class="reminder-label" id="reminderLabel">今日出門提醒</span>
+            <p class="reminder-message" id="reminderMessage">正在整理今天的行程⋯</p>
+            <p class="reminder-sub" id="reminderSub">網站開啟時更新提醒</p>
+          </div>
+        </section>
+
+        <div class="day-heading">
+          <div class="day-title-wrap">
+            <p class="day-eyebrow" id="dayEyebrow">YOUR DAY</p>
+            <h2 class="day-title" id="dayTitle">今天的約會</h2>
+          </div>
+          <p class="day-count" id="dayCount">0 場約會</p>
+        </div>
+
+        <section class="events-wrap" id="eventsWrap" aria-label="所選日期的行程"></section>
+
+        <div class="footer-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3"/></svg>
+          <span>行程保存在此瀏覽器；不會跨裝置同步。開啟地圖時，查詢地點會傳送給 Google。</span>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div>
+          <p class="modal-eyebrow">MAKE IT A GOOD DAY</p>
+          <h2 class="modal-title" id="modalTitle">安排一場約會</h2>
+          <p class="modal-copy">先填見面時間，再把準備和出門時間排好。</p>
+        </div>
+        <button class="icon-button" id="closeModalButton" type="button" aria-label="關閉表單">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <form id="eventForm" novalidate>
+        <input type="hidden" id="eventId">
+        <div class="form-grid">
+          <div class="field full">
+            <label for="eventName">行程名稱 <span class="required">*</span></label>
+            <input id="eventName" name="name" type="text" maxlength="60" placeholder="例如：晚餐約會" required>
+          </div>
+          <div class="field">
+            <label for="eventCategory">約會類型</label>
+            <select id="eventCategory" name="category">
+              <option value="dining">吃飯／喝咖啡</option>
+              <option value="movie">看電影／表演</option>
+              <option value="outdoor">戶外活動</option>
+              <option value="custom">自訂約會</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="eventLocation">碰面地點 <span class="required">*</span></label>
+            <input id="eventLocation" name="location" type="text" maxlength="200" placeholder="例如：星巴克＋分店名稱與地址" required>
+            <div class="map-search-row">
+              <button class="subtle-button" id="mapSearchButton" type="button">在 Google 地圖找分店 ↗</button>
+              <p class="map-search-help">選好分店後，把店名和地址貼回欄位；地圖不會自動回填。</p>
+            </div>
+          </div>
+          <div class="field full">
+            <label for="originMode">出發地</label>
+            <select id="originMode" name="originMode">
+              <option value="current">目前位置（預設）</option>
+              <option value="manual">自行輸入地點</option>
+            </select>
+            <div class="origin-current-row" id="currentOriginRow">
+              <button class="outline-button" id="locateOriginButton" type="button">取得目前位置</button>
+              <span class="origin-status" id="originStatus" aria-live="polite">尚未取得位置</span>
+            </div>
+            <div class="field" id="manualOriginField" hidden style="margin-top: 10px">
+              <label for="manualOrigin">輸入出發地 <span class="required">*</span></label>
+              <input id="manualOrigin" name="manualOrigin" type="text" maxlength="200" placeholder="例如：住家、公司或車站">
+            </div>
+            <p class="origin-help">定位座標保存在這個瀏覽器；開啟 Google 地圖時才會將出發地傳送給 Google。無法定位時可手動輸入。</p>
+          </div>
+          <div class="field">
+            <label for="eventDate">日期 <span class="required">*</span></label>
+            <input id="eventDate" name="date" type="date" min="1900-01-01" max="2100-12-31" required>
+          </div>
+          <div class="field">
+            <label for="eventTime">碰面時間 <span class="required">*</span></label>
+            <input id="eventTime" name="time" type="time" required>
+          </div>
+          <div class="field">
+            <label for="travelMode">交通方式</label>
+            <select id="travelMode" name="mode">
+              <option value="transit">大眾運輸</option>
+              <option value="walk">步行</option>
+              <option value="drive">開車</option>
+              <option value="bike">自行車</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="travelMinutes">交通時間</label>
+            <div class="input-suffix"><input id="travelMinutes" name="travelMinutes" type="number" min="0" max="600" step="1" inputmode="numeric" value="30" required><span>分鐘</span></div>
+            <p class="field-help">在行程卡可開啟 Google 地圖路線；交通分鐘請依地圖結果填寫，網站不會自動讀回時間。</p>
+          </div>
+          <div class="field">
+            <label for="prepMinutes">準備時間</label>
+            <div class="input-suffix"><input id="prepMinutes" name="prepMinutes" type="number" min="0" max="600" step="1" inputmode="numeric" value="45" required><span>分鐘</span></div>
+          </div>
+          <div class="field">
+            <label for="bufferMinutes">出門緩衝</label>
+            <div class="input-suffix"><input id="bufferMinutes" name="bufferMinutes" type="number" min="0" max="180" step="1" inputmode="numeric" value="15" required><span>分鐘</span></div>
+          </div>
+          <div class="time-preview" id="timePreview" role="status" aria-live="polite">填入日期與碰面時間後，會預覽開始準備和出門時間。</div>
+          <div class="form-divider"></div>
+          <div class="field full">
+            <div class="template-row">
+              <label class="field-label" for="eventItems">攜帶物品</label>
+              <button class="subtle-button" id="applyTemplateButton" type="button">套用類型建議</button>
+            </div>
+            <textarea id="eventItems" name="items" maxlength="12000" placeholder="每行一項，例如：手機、錢包、預約資訊"></textarea>
+            <p class="field-help">每行一項，最多 100 項、每項 120 字。建議清單可以自由修改，儲存後可在行程卡片勾選。</p>
+          </div>
+          <p class="form-error" id="formError" role="alert"></p>
+        </div>
+        <div class="modal-actions">
+          <button class="delete-button" id="deleteFromFormButton" type="button" hidden>刪除此行程</button>
+          <div class="modal-actions-right">
+            <button class="outline-button" id="cancelButton" type="button">取消</button>
+            <button class="primary-button" type="submit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+              儲存行程
+            </button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-icon" aria-hidden="true">✓</span><span id="toastMessage">已儲存</span></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "fu-yue-bu-huang-v1";
+      const templates = {
+        dining: ["手機", "錢包", "預約資訊", "行動電源"],
+        movie: ["手機", "錢包", "電影票／訂位資訊", "行動電源"],
+        outdoor: ["手機", "水", "舒適好走的鞋", "雨具", "防曬用品"],
+        custom: ["手機", "錢包"]
+      };
+      const categoryLabels = {
+        dining: "吃飯／喝咖啡",
+        movie: "看電影／表演",
+        outdoor: "戶外活動",
+        custom: "自訂約會"
+      };
+      const categoryIcons = { dining: "☕", movie: "✦", outdoor: "☀", custom: "♡" };
+      const modeLabels = { transit: "大眾運輸", walk: "步行", drive: "開車", bike: "自行車" };
+      const weekDays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+      const $ = (selector, root = document) => root.querySelector(selector);
+
+      const elements = {
+        calendarHeading: $("#calendarHeading"), calendarGrid: $("#calendarGrid"),
+        prevMonth: $("#prevMonth"), nextMonth: $("#nextMonth"), todayButton: $("#todayButton"),
+        heroDateDay: $("#heroDateDay"), heroDateWeekday: $("#heroDateWeekday"), welcomeKicker: $("#welcomeKicker"),
+        dayEyebrow: $("#dayEyebrow"), dayTitle: $("#dayTitle"), dayCount: $("#dayCount"), eventsWrap: $("#eventsWrap"),
+        reminderCard: $("#reminderCard"), reminderLabel: $("#reminderLabel"), reminderMessage: $("#reminderMessage"), reminderSub: $("#reminderSub"),
+        modalBackdrop: $("#modalBackdrop"), modalTitle: $("#modalTitle"), eventForm: $("#eventForm"),
+        eventId: $("#eventId"), eventName: $("#eventName"), eventCategory: $("#eventCategory"), eventLocation: $("#eventLocation"),
+        originMode: $("#originMode"), currentOriginRow: $("#currentOriginRow"), locateOriginButton: $("#locateOriginButton"),
+        originStatus: $("#originStatus"), manualOriginField: $("#manualOriginField"), manualOrigin: $("#manualOrigin"),
+        mapSearchButton: $("#mapSearchButton"), eventDate: $("#eventDate"), eventTime: $("#eventTime"), travelMode: $("#travelMode"), travelMinutes: $("#travelMinutes"),
+        prepMinutes: $("#prepMinutes"), bufferMinutes: $("#bufferMinutes"), eventItems: $("#eventItems"), formError: $("#formError"),
+        deleteFromFormButton: $("#deleteFromFormButton"), clearDataButton: $("#clearDataButton"), toast: $("#toast"), toastMessage: $("#toastMessage"),
+        storageBadge: $("#storageBadge"), storageBadgeText: $("#storageBadgeText"), storageWarning: $("#storageWarning"),
+        addDemoButton: $("#addDemoButton"), timePreview: $("#timePreview")
+      };
+
+      let storageNotice = "";
+      let storageHealthy = true;
+      let pendingRecoveryRaw = null;
+      const today = new Date();
+      let state = loadState();
+      let selectedDate = toDateString(today);
+      let visibleMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      let toastTimeout;
+      let formItemsTouched = false;
+      let currentOrigin = null;
+      let originRequestId = 0;
+      let modalReturnFocus = null;
+      let lastRenderedDay = toDateString(today);
+
+      function toDateString(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function timeString(date) {
+        return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+      }
+
+      function makeId() {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
+        return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+      }
+
+      function isValidDate(value) {
+        if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+        const [year, month, day] = value.split("-").map(Number);
+        const date = new Date(year, month - 1, day, 12);
+        return year >= 1900 && year <= 2100 && date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+      }
+
+      function isValidTime(value) {
+        return typeof value === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+      }
+
+      function normalizeCoordinates(value) {
+        if (!value || typeof value !== "object") return null;
+        const { latitude, longitude } = value;
+        if (!Number.isFinite(latitude) || Math.abs(latitude) > 90 || !Number.isFinite(longitude) || Math.abs(longitude) > 180) return null;
+        const result = { latitude, longitude };
+        if (Number.isFinite(value.accuracy) && value.accuracy >= 0) result.accuracy = value.accuracy;
+        return result;
+      }
+
+      function normalizeItems(items) {
+        if (!Array.isArray(items)) return [];
+        const result = [];
+        const seenText = new Set();
+        const seenIds = new Set();
+        for (const entry of items) {
+          const rawText = typeof entry === "string" ? entry : entry && typeof entry.text === "string" ? entry.text : "";
+          const text = rawText.trim().slice(0, 120);
+          if (!text || seenText.has(text.toLocaleLowerCase())) continue;
+          seenText.add(text.toLocaleLowerCase());
+          let id = entry && typeof entry.id === "string" && entry.id.length <= 100 ? entry.id : makeId();
+          if (!id || seenIds.has(id)) id = makeId();
+          seenIds.add(id);
+          result.push({ id, text, checked: Boolean(entry && typeof entry === "object" && entry.checked === true) });
+          if (result.length === 100) break;
+        }
+        return result;
+      }
+
+      function normalizeStoredState(value) {
+        if (!value || !Array.isArray(value.events)) throw new Error("行程資料格式不正確");
+        const seenIds = new Set();
+        const events = [];
+        const minutes = (value, max) => Number.isFinite(Number(value)) ? Math.min(max, Math.max(0, Math.round(Number(value)))) : 0;
+        for (const raw of value.events) {
+          if (!raw || typeof raw !== "object" || !isValidDate(raw.date) || !isValidTime(raw.time)) continue;
+          let id = typeof raw.id === "string" && raw.id.length <= 100 ? raw.id : makeId();
+          if (!id || seenIds.has(id)) id = makeId();
+          seenIds.add(id);
+          const coordinates = normalizeCoordinates(raw.originCoordinates);
+          events.push({
+            id,
+            name: typeof raw.name === "string" && raw.name.trim() ? raw.name.trim().slice(0, 60) : "未命名約會",
+            category: Object.hasOwn(categoryLabels, raw.category) ? raw.category : "custom",
+            date: raw.date, time: raw.time,
+            location: typeof raw.location === "string" ? raw.location.trim().slice(0, 200) : "",
+            mode: Object.hasOwn(modeLabels, raw.mode) ? raw.mode : "transit",
+            originMode: raw.originMode === "current" && coordinates ? "current" : "manual",
+            originLabel: typeof raw.originLabel === "string" ? raw.originLabel.trim().slice(0, 200) : "",
+            originCoordinates: raw.originMode === "current" ? coordinates : null,
+            travelMinutes: minutes(raw.travelMinutes, 600), prepMinutes: minutes(raw.prepMinutes, 600), bufferMinutes: minutes(raw.bufferMinutes, 180),
+            items: normalizeItems(raw.items)
+          });
+        }
+        return { version: 1, preferences: {}, events };
+      }
+
+      function canonicalJson(value) {
+        if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+        if (value && typeof value === "object") return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+        return JSON.stringify(value);
+      }
+
+      function validateEventData(event) {
+        if (!event || typeof event !== "object") return "行程資料格式不正確。";
+        if (typeof event.name !== "string" || !event.name.trim() || event.name.length > 60) return "請填寫 1～60 字的行程名稱。";
+        if (typeof event.location !== "string" || !event.location.trim() || event.location.length > 200) return "請填寫碰面地點（最多 200 字）。";
+        if (!isValidDate(event.date) || !isValidTime(event.time)) return "請填寫有效的日期（1900～2100 年）及碰面時間。";
+        if (![event.travelMinutes, event.prepMinutes].every(value => Number.isInteger(value) && value >= 0 && value <= 600)) return "交通與準備時間請填寫 0～600 的整數分鐘。";
+        if (!Number.isInteger(event.bufferMinutes) || event.bufferMinutes < 0 || event.bufferMinutes > 180) return "緩衝時間請填寫 0～180 的整數分鐘。";
+        if (event.originMode === "current" && !normalizeCoordinates(event.originCoordinates)) return "尚未取得目前位置，請重新定位或改為自行輸入出發地。";
+        if (event.originMode !== "current" && event.originMode !== "manual") return "請選擇目前位置或自行輸入出發地。";
+        if (event.originMode === "manual" && (typeof event.originLabel !== "string" || !event.originLabel.trim() || event.originLabel.length > 200)) return "請填寫出發地（最多 200 字），不能只有空白。";
+        if (!Object.hasOwn(modeLabels, event.mode) || !Object.hasOwn(categoryLabels, event.category)) return "請選擇有效的約會類型和交通方式。";
+        return "";
+      }
+
+      function dateOffset(days) {
+        const date = new Date();
+        date.setDate(date.getDate() + days);
+        return toDateString(date);
+      }
+
+      function demoEvents() {
+        const samples = [
+          { name: "咖啡約會（示範）", category: "dining", date: dateOffset(0), time: "14:30", location: "星巴克｜請用地圖選擇分店", originLabel: "台北車站", mode: "walk", travelMinutes: 15, prepMinutes: 30, bufferMinutes: 10, items: ["手機", "錢包", "行動電源"] },
+          { name: "晚餐約會（示範）", category: "dining", date: dateOffset(0), time: "19:00", location: "河畔小餐館（示範地點）", originLabel: "公司", mode: "transit", travelMinutes: 30, prepMinutes: 45, bufferMinutes: 15, items: ["手機", "錢包", "訂位資訊", "行動電源"] },
+          { name: "跨日電影約會（示範）", category: "movie", date: dateOffset(1), time: "00:30", location: "星光影城（示範地點）", originLabel: "家中", mode: "drive", travelMinutes: 30, prepMinutes: 45, bufferMinutes: 15, items: ["手機", "錢包", "電影票／訂位資訊"] },
+          { name: "電影約會（示範）", category: "movie", date: dateOffset(1), time: "19:00", location: "星光影城（示範地點）", originLabel: "家中", mode: "transit", travelMinutes: 28, prepMinutes: 45, bufferMinutes: 15, items: ["手機", "錢包", "電影票／訂位資訊"] },
+          { name: "公園散步（示範）", category: "outdoor", date: dateOffset(3), time: "15:30", location: "城市植物園入口（示範地點）", originLabel: "捷運站", mode: "bike", travelMinutes: 20, prepMinutes: 35, bufferMinutes: 10, items: ["手機", "水", "雨具", "防曬用品"] }
+        ];
+        return samples.map((sample, index) => ({ ...sample, id: makeId(), originMode: "manual", originCoordinates: null,
+          items: sample.items.map((text, itemIndex) => ({ id: makeId(), text, checked: index === 0 && itemIndex === 0 }))
+        }));
+      }
+
+      function loadState() {
+        let raw = null;
+        try {
+          raw = localStorage.getItem(STORAGE_KEY);
+          if (raw !== null) {
+            const parsed = JSON.parse(raw);
+            const normalized = normalizeStoredState(parsed);
+            if (canonicalJson(parsed.events) !== canonicalJson(normalized.events)) {
+              const backedUp = preserveRecovery(raw);
+              storageNotice = backedUp ? "已修復部分舊資料，並保留原始資料的本機備份；請檢查行程內容。" : "已載入可用行程，但無法備份舊資料。請先確認瀏覽器儲存空間，再儲存修改。";
+            }
+            return normalized;
+          }
+          const initial = { version: 1, preferences: {}, events: demoEvents() };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+          return initial;
+        } catch (error) {
+          console.warn("無法讀取本機行程資料。", error);
+          if (raw !== null) {
+            const backedUp = preserveRecovery(raw);
+            storageNotice = backedUp ? "先前資料格式損壞，原始內容已保留在本機備份。可以重新建立約會或加入示範行程。" : "先前資料格式損壞，且瀏覽器無法備份。原始資料仍保留，請先檢查儲存設定。";
+            return { version: 1, preferences: {}, events: [] };
+          }
+          storageHealthy = false;
+          storageNotice = "瀏覽器目前無法儲存資料；新操作若保存失敗，網站會保留原狀並顯示提示。";
+          return { version: 1, preferences: {}, events: demoEvents() };
+        }
+      }
+
+      function preserveRecovery(raw) {
+        pendingRecoveryRaw = raw;
+        try {
+          localStorage.setItem(`${STORAGE_KEY}-recovery`, raw);
+          pendingRecoveryRaw = null;
+          return true;
+        } catch (error) {
+          storageHealthy = false;
+          console.warn("無法建立本機備份。", error);
+          return false;
+        }
+      }
+
+      function renderStorageStatus() {
+        elements.storageBadge.classList.toggle("is-error", !storageHealthy);
+        elements.storageBadgeText.textContent = storageHealthy ? "資料保存在這個瀏覽器" : "目前無法儲存資料";
+        elements.storageWarning.hidden = !storageNotice;
+        elements.storageWarning.textContent = storageNotice;
+      }
+
+      function commitState(nextState) {
+        try {
+          if (pendingRecoveryRaw !== null) {
+            localStorage.setItem(`${STORAGE_KEY}-recovery`, pendingRecoveryRaw);
+            pendingRecoveryRaw = null;
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
+          state = nextState;
+          storageHealthy = true;
+          storageNotice = "";
+          renderStorageStatus();
+          return true;
+        } catch (error) {
+          console.warn("無法保存行程資料。", error);
+          storageHealthy = false;
+          storageNotice = "保存失敗，這次操作尚未套用。請確認瀏覽器允許儲存資料，且儲存空間足夠。";
+          renderStorageStatus();
+          showToast("保存失敗，這次操作尚未套用。", false);
+          return false;
+        }
+      }
+
+      function parseEventDateTime(event) {
+        return new Date(`${event.date}T${event.time || "00:00"}:00`);
+      }
+
+      function calculateTimes(event) {
+        const meeting = parseEventDateTime(event);
+        const route = Number(event.travelMinutes) || 0;
+        const buffer = Number(event.bufferMinutes) || 0;
+        const prep = Number(event.prepMinutes) || 0;
+        const leave = new Date(meeting.getTime() - (route + buffer) * 60000);
+        const prepare = new Date(leave.getTime() - prep * 60000);
+        return { meeting, leave, prepare, route, buffer, prep };
+      }
+
+      function formatTime(date) {
+        if (!Number.isFinite(date.getTime())) return "—";
+        return new Intl.DateTimeFormat("zh-TW", { hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
+      }
+
+      function formatActionTime(date, referenceDate) {
+        const prefix = toDateString(date) === referenceDate ? "" : `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} `;
+        return `${prefix}${formatTime(date)}`;
+      }
+
+      function timelineTimeHtml(date, referenceDate) {
+        const day = toDateString(date);
+        const dayLabel = day === referenceDate ? "" : `<span class="time-day">${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}</span>`;
+        return `${formatTime(date)}${dayLabel}`;
+      }
+
+      function updateTimePreview() {
+        const values = [elements.travelMinutes.value, elements.prepMinutes.value, elements.bufferMinutes.value];
+        if (!isValidDate(elements.eventDate.value) || !isValidTime(elements.eventTime.value) || values.some(value => value.trim() === "")) {
+          elements.timePreview.textContent = "填妥日期、碰面時間和分鐘數後，會預覽準備及出門時間。";
+          return;
+        }
+        const [travelMinutes, prepMinutes, bufferMinutes] = values.map(Number);
+        if (![travelMinutes, prepMinutes].every(value => Number.isInteger(value) && value >= 0 && value <= 600) || !Number.isInteger(bufferMinutes) || bufferMinutes < 0 || bufferMinutes > 180) {
+          elements.timePreview.textContent = "請輸入範圍內的整數分鐘：交通／準備 0～600，緩衝 0～180。";
+          return;
+        }
+        const times = calculateTimes({ date: elements.eventDate.value, time: elements.eventTime.value, travelMinutes, prepMinutes, bufferMinutes });
+        elements.timePreview.textContent = `開始準備：${formatActionTime(times.prepare, elements.eventDate.value)}　出門：${formatActionTime(times.leave, elements.eventDate.value)}　碰面：${elements.eventTime.value}。出門時間＝碰面時間－交通－緩衝；準備時間再往前推。`;
+      }
+
+      function formatMonth(date) {
+        return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月`;
+      }
+
+      function formatSelectedDate(dateString) {
+        const date = new Date(`${dateString}T12:00:00`);
+        return `${date.getMonth() + 1} 月 ${date.getDate()} 日`;
+      }
+
+      function formatFullDate(dateString) {
+        const date = new Date(`${dateString}T12:00:00`);
+        return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日（${weekDays[date.getDay()]}）`;
+      }
+
+      function originLabelForEvent(event) {
+        if (event.originMode === "current" && event.originCoordinates && Number.isFinite(event.originCoordinates.latitude) && Number.isFinite(event.originCoordinates.longitude)) {
+          return `目前位置（${event.originCoordinates.latitude.toFixed(5)}, ${event.originCoordinates.longitude.toFixed(5)}）`;
+        }
+        if (event.originMode === "current") return "目前位置（未取得座標）";
+        return event.originLabel || "尚未設定";
+      }
+
+      function updateOriginFields() {
+        const isManual = elements.originMode.value === "manual";
+        elements.currentOriginRow.hidden = isManual;
+        elements.manualOriginField.hidden = !isManual;
+        elements.manualOrigin.required = isManual;
+      }
+
+      function updateOriginStatus() {
+        if (!currentOrigin) {
+          elements.originStatus.textContent = "尚未取得位置";
+          return;
+        }
+        const accuracy = Number.isFinite(currentOrigin.accuracy) ? `，精確度約 ${Math.round(currentOrigin.accuracy)} 公尺` : "";
+        elements.originStatus.textContent = `已取得位置${accuracy}`;
+      }
+
+      function requestCurrentLocation() {
+        const requestId = ++originRequestId;
+        const previousOrigin = currentOrigin;
+        if (!navigator.geolocation) {
+          elements.originStatus.textContent = "此瀏覽器不支援定位，請改用自行輸入";
+          return;
+        }
+        elements.originStatus.textContent = "正在取得目前位置…";
+        elements.locateOriginButton.disabled = true;
+        try {
+          navigator.geolocation.getCurrentPosition(position => {
+            if (requestId !== originRequestId || elements.originMode.value !== "current") return;
+            currentOrigin = normalizeCoordinates({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy
+            });
+            updateOriginStatus();
+            elements.locateOriginButton.disabled = false;
+          }, error => {
+            if (requestId !== originRequestId || elements.originMode.value !== "current") return;
+            currentOrigin = previousOrigin;
+            const reason = error.code === error.PERMISSION_DENIED
+              ? "未允許定位，請改為自行輸入或在瀏覽器允許定位"
+              : error.code === error.POSITION_UNAVAILABLE
+                ? "目前無法取得位置，請改為自行輸入"
+                : "定位逾時，請重試或改為自行輸入";
+            elements.originStatus.textContent = `${reason}${previousOrigin ? "；仍保留先前取得的位置" : ""}`;
+            elements.locateOriginButton.disabled = false;
+          }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
+        } catch (error) {
+          elements.originStatus.textContent = "瀏覽器限制定位，請改為自行輸入出發地";
+          elements.locateOriginButton.disabled = false;
+        }
+      }
+
+      function googleMapsSearchUrl(query, nearbyOrigin = "") {
+        const searchText = query.trim() || "Starbucks";
+        const searchQuery = nearbyOrigin ? `${searchText} near ${nearbyOrigin}` : searchText;
+        const params = new URLSearchParams({ api: "1", query: searchQuery });
+        return `https://www.google.com/maps/search/?${params.toString()}`;
+      }
+
+      function googleMapsDirectionsUrl(event) {
+        const coordinates = event.originCoordinates;
+        const origin = event.originMode === "current" && coordinates && Number.isFinite(coordinates.latitude) && Number.isFinite(coordinates.longitude)
+          ? `${coordinates.latitude},${coordinates.longitude}`
+          : (event.originLabel || "");
+        const mode = { transit: "transit", walk: "walking", drive: "driving", bike: "bicycling" }[event.mode] || "transit";
+        const params = new URLSearchParams({ api: "1", destination: event.location || "", travelmode: mode });
+        if (origin) params.set("origin", origin);
+        return `https://www.google.com/maps/dir/?${params.toString()}`;
+      }
+
+      function getEventsForDate(dateString) {
+        return state.events.filter(event => event.date === dateString).sort((a, b) => a.time.localeCompare(b.time));
+      }
+
+      function renderCalendar() {
+        elements.calendarHeading.textContent = formatMonth(visibleMonth);
+        const year = visibleMonth.getFullYear();
+        const month = visibleMonth.getMonth();
+        const firstWeekday = new Date(year, month, 1).getDay();
+        const dayCount = new Date(year, month + 1, 0).getDate();
+        const todayString = toDateString(new Date());
+        const eventsByDate = new Map();
+        state.events.forEach(event => eventsByDate.set(event.date, (eventsByDate.get(event.date) || 0) + 1));
+        elements.prevMonth.disabled = year === 1900 && month === 0;
+        elements.nextMonth.disabled = year === 2100 && month === 11;
+        let html = "";
+        for (let i = 0; i < firstWeekday; i += 1) html += '<span class="calendar-empty" role="presentation"></span>';
+        for (let day = 1; day <= dayCount; day += 1) {
+          const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+          const classes = ["calendar-day"];
+          if (dateString === selectedDate) classes.push("selected");
+          if (dateString === todayString) classes.push("today");
+          if (eventsByDate.has(dateString)) classes.push("has-event");
+          const count = eventsByDate.get(dateString) || 0;
+          html += `<button class="${classes.join(" ")}" type="button" data-date="${dateString}" tabindex="${dateString === selectedDate ? "0" : "-1"}" ${dateString === todayString ? 'aria-current="date"' : ""} aria-label="${year} 年 ${month + 1} 月 ${day} 日${count ? `，${count} 場行程` : ""}" aria-pressed="${dateString === selectedDate}">${day}</button>`;
+        }
+        const totalCells = firstWeekday + dayCount;
+        const trailing = (7 - totalCells % 7) % 7;
+        for (let i = 0; i < trailing; i += 1) html += '<span class="calendar-empty" role="presentation"></span>';
+        elements.calendarGrid.innerHTML = html;
+      }
+
+      function eventCardHtml(event) {
+        const times = calculateTimes(event);
+        const category = categoryLabels[event.category] || categoryLabels.custom;
+        const icon = categoryIcons[event.category] || "♡";
+        const itemList = Array.isArray(event.items) ? event.items : [];
+        const checkedCount = itemList.filter(item => item.checked).length;
+        const checklistHtml = itemList.length
+          ? itemList.map(item => `<label class="check-item${item.checked ? " is-checked" : ""}"><input type="checkbox" data-item-check="${escapeHtml(item.id)}" data-event-id="${escapeHtml(event.id)}" ${item.checked ? "checked" : ""} aria-label="${item.checked ? "取消勾選" : "勾選"}${escapeHtml(item.text)}"><span>${escapeHtml(item.text)}</span></label>`).join("")
+          : '<span class="no-items">還沒有物品，編輯行程新增清單。</span>';
+        return `
+          <article class="event-card" data-event-card="${escapeHtml(event.id)}">
+            <div class="event-time-column">
+              <time class="event-start-time">${escapeHtml(event.time)}</time>
+              <span class="event-time-caption">碰面</span>
+              <span class="event-category-icon" aria-hidden="true">${icon}</span>
+            </div>
+            <div class="event-main">
+              <div class="event-topline">
+                <div>
+                  <h3 class="event-title">${escapeHtml(event.name)}</h3>
+                  <span class="event-type">${escapeHtml(category)}</span>
+                </div>
+                <div class="event-actions">
+                  <button class="icon-button" type="button" data-edit-event="${escapeHtml(event.id)}" aria-label="編輯${escapeHtml(event.name)}" title="編輯行程">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 5 5 5M4 20l4.2-.8L19.5 7.9a2.1 2.1 0 0 0-3-3L5.2 16.2 4 20Z"/></svg>
+                  </button>
+                  <button class="icon-button" type="button" data-delete-event="${escapeHtml(event.id)}" aria-label="刪除${escapeHtml(event.name)}" title="刪除行程">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5.5 7l1 13h11l1-13M9 7V4h6v3"/></svg>
+                  </button>
+                </div>
+              </div>
+              <p class="event-date">${escapeHtml(formatFullDate(event.date))}</p>
+              <div class="trip-details" aria-label="約會地點與交通資訊">
+                <div class="trip-detail"><span class="trip-detail-label">出發地</span><span class="trip-detail-value">${escapeHtml(originLabelForEvent(event))}</span></div>
+                <div class="trip-detail"><span class="trip-detail-label">碰面地點</span><span class="trip-detail-value">${escapeHtml(event.location || "尚未填寫地點")}</span></div>
+                <div class="trip-detail"><span class="trip-detail-label">交通方式</span><span class="trip-detail-value">${escapeHtml(modeLabels[event.mode] || "尚未設定")}</span></div>
+                <div class="trip-detail"><span class="trip-detail-label">預估路程</span><span class="trip-detail-value">${times.route} 分鐘＋${times.buffer} 分鐘緩衝</span></div>
+                <a class="map-directions-link" href="${escapeHtml(googleMapsDirectionsUrl(event))}" target="_blank" rel="noopener noreferrer">在 Google 地圖看路線 ↗</a>
+              </div>
+              <div class="timeline" aria-label="準備與出門時間">
+                <div class="timeline-step highlight"><span class="step-label"><i class="step-dot"></i>開始準備</span><time class="step-time" datetime="${toDateString(times.prepare)}T${timeString(times.prepare)}">${timelineTimeHtml(times.prepare, event.date)}</time><span class="step-detail">準備 ${times.prep} 分鐘</span></div>
+                <div class="timeline-step"><span class="step-label"><i class="step-dot"></i>建議出門</span><time class="step-time" datetime="${toDateString(times.leave)}T${timeString(times.leave)}">${timelineTimeHtml(times.leave, event.date)}</time><span class="step-detail">路程 ${times.route} 分＋緩衝 ${times.buffer} 分</span></div>
+                <div class="timeline-step meet"><span class="step-label"><i class="step-dot"></i>碰面時間</span><time class="step-time">${escapeHtml(event.time)}</time><span class="step-detail">準時赴約</span></div>
+              </div>
+              <div class="checklist">
+                <div class="checklist-head"><p class="checklist-title">出門前確認</p><span class="checklist-progress">${checkedCount} / ${itemList.length} 已完成</span></div>
+                <div class="checklist-items">${checklistHtml}</div>
+              </div>
+            </div>
+          </article>`;
+      }
+
+      function eventSummaryHtml(event) {
+        return `<button class="agenda-row" type="button" role="listitem" data-agenda-event="${escapeHtml(event.id)}" aria-label="${escapeHtml(event.time || "時間未定")}，${escapeHtml(event.name || "未命名約會")}，${escapeHtml(event.location || "地點未填")}">
+          <time class="agenda-time">${escapeHtml(event.time || "--:--")}</time>
+          <span class="agenda-description"><strong class="agenda-name">${escapeHtml(event.name || "未命名約會")}</strong><small class="agenda-location">${escapeHtml(event.location || "地點尚未填寫")}</small></span>
+          <span class="agenda-arrow" aria-hidden="true">›</span>
+        </button>`;
+      }
+
+      function basicEventCardHtml(event) {
+        return `<article class="event-card" data-event-card="${escapeHtml(event.id)}">
+          <div class="event-time-column"><time class="event-start-time">${escapeHtml(event.time || "--:--")}</time><span class="event-time-caption">碰面</span></div>
+          <div class="event-main"><h3 class="event-title">${escapeHtml(event.name || "未命名約會")}</h3>
+            <p class="event-date">${escapeHtml(formatFullDate(event.date))}</p>
+            <p class="event-location">${escapeHtml(event.location || "地點尚未填寫")}</p>
+            <p class="field-help">部分詳細資訊無法顯示；請編輯這筆約會確認資料。</p>
+            <button class="subtle-button" type="button" data-edit-event="${escapeHtml(event.id)}">編輯約會</button>
+          </div>
+        </article>`;
+      }
+
+      function renderEvents() {
+        const list = getEventsForDate(selectedDate);
+        const todayString = toDateString(new Date());
+        const selected = new Date(`${selectedDate}T12:00:00`);
+        const isToday = selectedDate === todayString;
+        elements.dayEyebrow.textContent = isToday ? "YOUR DAY · TODAY" : "YOUR DAY";
+        elements.dayTitle.textContent = isToday ? "今天的約會" : `${formatSelectedDate(selectedDate)}的約會`;
+        elements.dayCount.textContent = `${list.length} 場約會`;
+        elements.heroDateDay.textContent = String(selected.getDate()).padStart(2, "0");
+        elements.heroDateWeekday.textContent = weekDays[selected.getDay()];
+        elements.welcomeKicker.textContent = isToday ? "今天，慢慢準備也來得及" : "先把約會安排好，期待就留給見面";
+
+        if (list.length) {
+          const agendaRows = list.map(event => {
+            try { return eventSummaryHtml(event); }
+            catch (error) { return `<p class="agenda-row-fallback">${escapeHtml(event.time || "--:--")}　${escapeHtml(event.name || "未命名約會")}</p>`; }
+          }).join("");
+          elements.eventsWrap.innerHTML = `<section class="day-agenda" aria-label="所選日期的時間與約會摘要"><p class="day-agenda-heading">${isToday ? "今天的安排" : "當日安排"} · ${list.length} 場約會</p><div class="day-agenda-rows" role="list">${agendaRows}</div></section>`;
+          list.forEach(event => {
+            let cardMarkup;
+            try { cardMarkup = eventCardHtml(event); }
+            catch (error) {
+              console.warn("無法呈現完整約會資訊，改顯示摘要。", error);
+              cardMarkup = basicEventCardHtml(event);
+            }
+            elements.eventsWrap.insertAdjacentHTML("beforeend", cardMarkup);
+          });
+        } else {
+          elements.eventsWrap.innerHTML = `
+            <div class="empty-state">
+              <div>
+                <div class="empty-illustration" aria-hidden="true">♡</div>
+                <h3 class="empty-title">這天還沒有約會</h3>
+                <p class="empty-copy">先把見面時間記下來，我們會幫你排好開始準備和出門的時間。</p>
+                <button class="primary-button" type="button" data-add-for-selected>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                  新增這天的約會
+                </button>
+              </div>
+            </div>`;
+        }
+      }
+
+      function reminderForEvents(events, now) {
+        const todayString = toDateString(now);
+        const future = events.map(event => ({ event, times: calculateTimes(event) })).filter(row => row.times.meeting > now).sort((a, b) => a.times.meeting - b.times.meeting);
+        const upcoming = future.filter(row => toDateString(row.times.prepare) <= todayString);
+        if (!upcoming.length) {
+          const next = future[0];
+          return { label: "今日出門提醒", message: "今天沒有待出門的約會。", sub: next ? `下一場：${formatActionTime(next.times.meeting, todayString)} · ${next.event.name}` : "可以選擇日期，安排下一場約會。", isNow: false, isDone: true };
+        }
+        const { event, times } = upcoming[0];
+        const sub = `${formatActionTime(times.meeting, todayString)} · ${event.name}`;
+        if (now >= times.leave) return { label: "出門提醒", message: `現在該出門囉，前往${event.location || "約會地點"}。`, sub: `${sub}｜預估路程 ${times.route} 分鐘`, isNow: true, isDone: false };
+        if (now >= times.prepare) return { label: "準備提醒", message: `現在開始準備，${formatActionTime(times.leave, todayString)} 出門。`, sub, isNow: true, isDone: false };
+        return { label: "今日下一個提醒", message: `${formatActionTime(times.prepare, todayString)} 開始準備，${formatActionTime(times.leave, todayString)} 出門。`, sub, isNow: false, isDone: false };
+      }
+
+      function renderReminder() {
+        const reminder = reminderForEvents(state.events, new Date());
+        elements.reminderCard.classList.toggle("is-now", reminder.isNow);
+        elements.reminderCard.classList.toggle("is-done", reminder.isDone);
+        elements.reminderLabel.textContent = reminder.label;
+        elements.reminderMessage.textContent = reminder.message;
+        elements.reminderSub.textContent = reminder.sub;
+      }
+
+      function renderAll() {
+        renderStorageStatus();
+        renderCalendar();
+        renderEvents();
+        renderReminder();
+      }
+
+      function showToast(message, success = true) {
+        elements.toastMessage.textContent = message;
+        const icon = $(".toast-icon", elements.toast);
+        icon.textContent = success ? "✓" : "!";
+        icon.style.background = success ? "#cce5d5" : "#f4d3c8";
+        icon.style.color = success ? "#264f40" : "#854735";
+        elements.toast.classList.add("show");
+        window.clearTimeout(toastTimeout);
+        toastTimeout = window.setTimeout(() => elements.toast.classList.remove("show"), 2600);
+      }
+
+      function openModal(eventId = null, date = selectedDate) {
+        originRequestId += 1;
+        elements.locateOriginButton.disabled = false;
+        modalReturnFocus = document.activeElement;
+        elements.eventForm.reset();
+        formItemsTouched = false;
+        elements.formError.classList.remove("show");
+        elements.formError.textContent = "";
+        elements.eventId.value = "";
+        elements.eventCategory.value = "dining";
+        elements.eventDate.value = date;
+        elements.travelMode.value = "transit";
+        elements.travelMinutes.value = "30";
+        elements.prepMinutes.value = "45";
+        elements.bufferMinutes.value = "15";
+        elements.eventItems.value = templates.dining.join("\n");
+        elements.originMode.value = "current";
+        elements.manualOrigin.value = "";
+        currentOrigin = null;
+        updateOriginFields();
+        updateOriginStatus();
+        elements.deleteFromFormButton.hidden = true;
+        elements.modalTitle.textContent = eventId ? "編輯約會" : "安排一場約會";
+        if (eventId) {
+          const event = state.events.find(item => item.id === eventId);
+          if (!event) return;
+          formItemsTouched = true;
+          elements.eventId.value = event.id;
+          elements.eventName.value = event.name || "";
+          elements.eventCategory.value = event.category || "custom";
+          elements.eventLocation.value = event.location || "";
+          if (event.originMode === "current" && event.originCoordinates && Number.isFinite(event.originCoordinates.latitude) && Number.isFinite(event.originCoordinates.longitude)) {
+            elements.originMode.value = "current";
+            currentOrigin = { ...event.originCoordinates };
+          } else {
+            elements.originMode.value = "manual";
+            elements.manualOrigin.value = event.originLabel || "";
+          }
+          updateOriginFields();
+          updateOriginStatus();
+          elements.eventDate.value = event.date;
+          elements.eventTime.value = event.time;
+          elements.travelMode.value = event.mode || "transit";
+          elements.travelMinutes.value = Number(event.travelMinutes) || 0;
+          elements.prepMinutes.value = Number(event.prepMinutes) || 0;
+          elements.bufferMinutes.value = Number(event.bufferMinutes) || 0;
+          elements.eventItems.value = (event.items || []).map(item => item.text).join("\n");
+          elements.deleteFromFormButton.hidden = false;
+        }
+        elements.modalBackdrop.classList.add("open");
+        elements.modalBackdrop.setAttribute("aria-hidden", "false");
+        $(".app-shell").inert = true;
+        document.body.style.overflow = "hidden";
+        updateTimePreview();
+        window.setTimeout(() => elements.eventName.focus(), 40);
+        if (!eventId && elements.originMode.value === "current") requestCurrentLocation();
+      }
+
+      function closeModal() {
+        originRequestId += 1;
+        elements.locateOriginButton.disabled = false;
+        elements.modalBackdrop.classList.remove("open");
+        elements.modalBackdrop.setAttribute("aria-hidden", "true");
+        $(".app-shell").inert = false;
+        document.body.style.overflow = "";
+        if (modalReturnFocus && modalReturnFocus.isConnected) modalReturnFocus.focus();
+      }
+
+      function parseItems(text, existingItems = []) {
+        const oldByText = new Map(normalizeItems(existingItems).map(item => [item.text.toLowerCase(), item]));
+        return String(text).split(/[\n,，、]/).map(line => line.trim()).filter(Boolean).filter((item, index, array) => array.findIndex(other => other.toLowerCase() === item.toLowerCase()) === index)
+          .map(textValue => {
+            const old = oldByText.get(textValue.toLowerCase());
+            return { id: old ? old.id : makeId(), text: textValue, checked: old ? Boolean(old.checked) : false };
+          });
+      }
+
+      function displayFormError(message) {
+        elements.formError.textContent = message;
+        elements.formError.classList.add("show");
+        elements.formError.scrollIntoView({ block: "nearest" });
+      }
+
+      function submitForm(event) {
+        event.preventDefault();
+        elements.formError.classList.remove("show");
+        updateOriginFields();
+        if (!elements.eventForm.reportValidity()) return;
+        const route = Number(elements.travelMinutes.value);
+        const prep = Number(elements.prepMinutes.value);
+        const buffer = Number(elements.bufferMinutes.value);
+        const rawItems = elements.eventItems.value.split(/[\n,，、]/).map(text => text.trim()).filter(Boolean);
+        if (rawItems.length > 100 || rawItems.some(text => text.length > 120)) {
+          displayFormError("攜帶物品最多 100 項，每項最多 120 字。 ");
+          return;
+        }
+        const id = elements.eventId.value;
+        const existing = state.events.find(item => item.id === id);
+        if (id && !existing) { displayFormError("這筆約會已不存在，請關閉表單後重新操作。"); return; }
+        const eventData = {
+          id: id || makeId(),
+          name: elements.eventName.value.trim(),
+          category: elements.eventCategory.value,
+          location: elements.eventLocation.value.trim(),
+          originMode: elements.originMode.value,
+          originLabel: elements.originMode.value === "manual" ? elements.manualOrigin.value.trim() : "",
+          originCoordinates: elements.originMode.value === "current" ? currentOrigin : null,
+          date: elements.eventDate.value,
+          time: elements.eventTime.value,
+          mode: elements.travelMode.value,
+          travelMinutes: route,
+          prepMinutes: prep,
+          bufferMinutes: buffer,
+          items: parseItems(elements.eventItems.value, existing ? existing.items : [])
+        };
+        const validationError = validateEventData(eventData);
+        if (validationError) {
+          displayFormError(validationError);
+          return;
+        }
+        const nextEvents = existing ? state.events.map(item => item.id === id ? eventData : item) : [...state.events, eventData];
+        if (!commitState({ ...state, events: nextEvents })) { displayFormError("行程尚未儲存，請檢查瀏覽器的儲存設定後重試。"); return; }
+        selectedDate = eventData.date;
+        const savedDate = new Date(`${eventData.date}T12:00:00`);
+        visibleMonth = new Date(savedDate.getFullYear(), savedDate.getMonth(), 1);
+        closeModal();
+        renderAll();
+        $("#addEventButton").focus();
+        showToast(existing ? "行程已更新" : "約會已加入行事曆");
+      }
+
+      function deleteEvent(eventId) {
+        const event = state.events.find(item => item.id === eventId);
+        if (!event) return false;
+        if (!window.confirm(`確定刪除「${event.name}」嗎？`)) return false;
+        if (!commitState({ ...state, events: state.events.filter(item => item.id !== eventId) })) return false;
+        closeModal();
+        renderAll();
+        $("#addEventButton").focus();
+        showToast("行程已刪除");
+        return true;
+      }
+
+      function shiftedMonthSelection(year, month, dateString, delta) {
+        const target = new Date(year, month + delta, 1);
+        if (target.getFullYear() < 1900 || target.getFullYear() > 2100) return null;
+        const selectedDay = Number(dateString.slice(-2)) || 1;
+        const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+        return { month: target, date: toDateString(new Date(target.getFullYear(), target.getMonth(), Math.min(selectedDay, lastDay))) };
+      }
+
+      function changeMonth(delta) {
+        const next = shiftedMonthSelection(visibleMonth.getFullYear(), visibleMonth.getMonth(), selectedDate, delta);
+        if (!next) return;
+        visibleMonth = next.month;
+        selectedDate = next.date;
+        renderAll();
+      }
+
+      function addDemoEvents() {
+        const samples = demoEvents().filter(sample => !state.events.some(event => event.name === sample.name && event.date === sample.date && event.time === sample.time));
+        if (!samples.length) { showToast("目前已經有這組示範行程。"); return; }
+        if (state.events.length && !window.confirm(`會新增 ${samples.length} 筆示範行程，既有行程會保留。要加入嗎？`)) return;
+        if (!commitState({ ...state, events: [...state.events, ...samples] })) return;
+        const now = new Date();
+        selectedDate = toDateString(now);
+        visibleMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        renderAll();
+        showToast(`已加入 ${samples.length} 筆示範行程`);
+      }
+
+      function applyTemplate() {
+        const category = elements.eventCategory.value;
+        const items = templates[category] || templates.custom;
+        const current = elements.eventItems.value.trim();
+        if (formItemsTouched && current && !window.confirm("套用建議清單會取代目前輸入的物品。要繼續嗎？")) return;
+        elements.eventItems.value = items.join("\n");
+        formItemsTouched = true;
+        showToast("已帶入建議清單");
+      }
+
+      elements.prevMonth.addEventListener("click", () => changeMonth(-1));
+      elements.nextMonth.addEventListener("click", () => changeMonth(1));
+      elements.todayButton.addEventListener("click", () => {
+        const now = new Date();
+        selectedDate = toDateString(now);
+        visibleMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        renderAll();
+      });
+      elements.calendarGrid.addEventListener("click", event => {
+        const button = event.target.closest("[data-date]");
+        if (!button) return;
+        selectedDate = button.dataset.date;
+        renderAll();
+      });
+      elements.calendarGrid.addEventListener("keydown", event => {
+        const button = event.target.closest("[data-date]");
+        if (!button) return;
+        const offsets = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+        if (Object.hasOwn(offsets, event.key)) {
+          event.preventDefault();
+          const date = new Date(`${button.dataset.date}T12:00:00`);
+          date.setDate(date.getDate() + offsets[event.key]);
+          if (!isValidDate(toDateString(date))) return;
+          selectedDate = toDateString(date);
+          visibleMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+          renderAll();
+        } else if (event.key === "PageUp" || event.key === "PageDown") {
+          event.preventDefault();
+          changeMonth(event.key === "PageUp" ? -1 : 1);
+        } else return;
+        elements.calendarGrid.querySelector(`[data-date="${selectedDate}"]`).focus();
+      });
+      document.addEventListener("click", event => {
+        if (event.target.closest("[data-add-for-selected]")) openModal(null, selectedDate);
+      });
+      $("#addEventButton").addEventListener("click", () => openModal(null, selectedDate));
+
+      elements.eventsWrap.addEventListener("click", event => {
+        const agendaRow = event.target.closest("[data-agenda-event]");
+        const editButton = event.target.closest("[data-edit-event]");
+        const deleteButton = event.target.closest("[data-delete-event]");
+        if (agendaRow) {
+          const card = [...elements.eventsWrap.querySelectorAll("[data-event-card]")].find(item => item.dataset.eventCard === agendaRow.dataset.agendaEvent);
+          if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        if (editButton) openModal(editButton.dataset.editEvent);
+        if (deleteButton) deleteEvent(deleteButton.dataset.deleteEvent);
+      });
+      elements.eventsWrap.addEventListener("change", event => {
+        const checkbox = event.target.closest("[data-item-check]");
+        if (!checkbox) return;
+        const targetEvent = state.events.find(item => item.id === checkbox.dataset.eventId);
+        if (!targetEvent) return;
+        const item = (targetEvent.items || []).find(entry => entry.id === checkbox.dataset.itemCheck);
+        if (!item) return;
+        const checked = checkbox.checked;
+        const nextEvents = state.events.map(entry => entry.id !== targetEvent.id ? entry : { ...entry, items: entry.items.map(value => value.id === item.id ? { ...value, checked } : value) });
+        if (!commitState({ ...state, events: nextEvents })) { checkbox.checked = item.checked; return; }
+        renderEvents();
+        const replacement = [...elements.eventsWrap.querySelectorAll("[data-item-check]")].find(input => input.dataset.itemCheck === item.id && input.dataset.eventId === targetEvent.id);
+        if (replacement) replacement.focus({ preventScroll: true });
+      });
+      elements.eventForm.addEventListener("submit", submitForm);
+      elements.originMode.addEventListener("change", () => {
+        originRequestId += 1;
+        elements.locateOriginButton.disabled = false;
+        updateOriginFields();
+        elements.formError.classList.remove("show");
+        if (elements.originMode.value === "current" && !currentOrigin) requestCurrentLocation();
+      });
+      elements.locateOriginButton.addEventListener("click", requestCurrentLocation);
+      elements.mapSearchButton.addEventListener("click", () => {
+        const nearbyOrigin = elements.originMode.value === "current" && currentOrigin
+          ? `${currentOrigin.latitude},${currentOrigin.longitude}`
+          : elements.originMode.value === "manual" ? elements.manualOrigin.value.trim() : "";
+        const mapUrl = googleMapsSearchUrl(elements.eventLocation.value, nearbyOrigin);
+        window.open(mapUrl, "_blank", "noopener,noreferrer");
+      });
+      elements.eventCategory.addEventListener("change", () => {
+        if (!elements.eventId.value && !formItemsTouched) {
+          elements.eventItems.value = (templates[elements.eventCategory.value] || templates.custom).join("\n");
+        }
+      });
+      elements.eventItems.addEventListener("input", () => { formItemsTouched = true; });
+      [elements.eventDate, elements.eventTime, elements.travelMinutes, elements.prepMinutes, elements.bufferMinutes].forEach(input => input.addEventListener("input", updateTimePreview));
+      $("#closeModalButton").addEventListener("click", closeModal);
+      $("#cancelButton").addEventListener("click", closeModal);
+      elements.modalBackdrop.addEventListener("click", event => { if (event.target === elements.modalBackdrop) closeModal(); });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && elements.modalBackdrop.classList.contains("open")) closeModal();
+        if (event.key === "Tab" && elements.modalBackdrop.classList.contains("open")) {
+          const focusable = [...elements.modalBackdrop.querySelectorAll("button, input, select, textarea, a[href], [tabindex]")].filter(node => !node.disabled && node.type !== "hidden" && node.tabIndex >= 0 && node.getClientRects().length);
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      });
+      elements.deleteFromFormButton.addEventListener("click", () => deleteEvent(elements.eventId.value));
+      $("#applyTemplateButton").addEventListener("click", applyTemplate);
+      elements.addDemoButton.addEventListener("click", addDemoEvents);
+      elements.clearDataButton.addEventListener("click", () => {
+        const confirmed = window.confirm("確定清除這個瀏覽器裡保存的所有行程嗎？清除後無法復原。");
+        if (!confirmed) return;
+        if (!commitState({ version: 1, preferences: {}, events: [] })) return;
+        selectedDate = toDateString(new Date());
+        const now = new Date();
+        visibleMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        renderAll();
+        showToast("本機行程資料已清除");
+      });
+
+      renderAll();
+      function refreshClock() {
+        const currentDay = toDateString(new Date());
+        if (currentDay !== lastRenderedDay) {
+          if (selectedDate === lastRenderedDay) {
+            selectedDate = currentDay;
+            const now = new Date();
+            visibleMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          }
+          lastRenderedDay = currentDay;
+          renderAll();
+        } else renderReminder();
+      }
+      window.setInterval(refreshClock, 30000);
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshClock(); });
+    })();
+  </script>
+</body>
+</html>
